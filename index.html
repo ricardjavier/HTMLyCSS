@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <title>Bar/Restoran</title>
+</head>
+<body>
+
+    <div class="background">
+        <div class="overlay">
+    
+   <h1>BAR CHAPALA</h1> 
+    <h2>Un lugar para compartir y disfrutar con tu familia.</h2> 
+        <p>Disfruta de nuestras deliciosas pizzas artesanales, jugosas hamburguesas y exquisitos sándwiches, todos preparados con ingredientes frescos y de alta calidad. ¡Ven y satisface tu apetito! </p>
+        </div>
+        <div class="container">
+            <div class="left">
+
+<h3>HAMBURGUESAS</h3>
+<ul>
+    <li onclick="fetchPrice('Clasic Burguer')"> Clasic Burguer </li>
+    <li onclick="fetchPrice('Veggie Burguer')"> Veggie Burguer </li>
+    <li onclick="fetchPrice('Special Burguer')"> Special Burguer </li>
+    
+</ul>
+<h3>ENTRADAS</h3>
+<ul>
+    <li onclick="fetchPrice('Ración tequeños')"> Ración tequeños </li>
+    <li onclick="fetchPrice('4 mini arepas')"> 4 mini arepas </li>
+    <li onclick="fetchPrice('Ración de papas fritas')"> Ración de papas fritas </li>
+</ul>
+<h3>SANDWICHES</h3>
+<ul>
+    <li onclick="fetchPrice('Clasic Sandwiches')"> Clasic Sandwiches </li>
+    <li onclick="fetchPrice('Sandwiches Carne')"> Sandwiches Carne </li>
+    <li onclick="fetchPrice('Sandwiches Pollo')"> Sandwiches Pollo </li>
+    
+</ul>
+<h3>PIZZAS</h3>
+<ul>
+    <li onclick="fetchPrice('Americana')"> Americana </li>
+    <li onclick="fetchPrice('Napolitana')"> Napolitana </li>
+    <li onclick="fetchPrice('4 Estaciones')"> 4 Estaciones </li>
+</ul>
+            </div>
+
+        <div class="divider"></div>
+        <div class="right">
+
+<h3>BEBIDAS</h3>
+<ul>
+    <li onclick="fetchPrice('Sprite')"> Sprite </li>
+    <li onclick="fetchPrice('Coca-Cola')"> Coca-Cola </li>
+    <li onclick="fetchPrice('Fanta')"> Fanta </li>
+</ul>
+
+<h3>JUGOS</h3>
+<ul>
+    <li onclick="fetchPrice('Maracuya')"> Maracuya </li>
+    <li onclick="fetchPrice('Piña')"> Piña </li>
+    <li onclick="fetchPrice('Fresa')"> Fresa </li>
+</ul>
+<h3>CERVEZAS</h3>
+<ul>
+    <li onclick="fetchPrice('Torobayo')"> Torobayo </li>
+    <li onclick="fetchPrice('Heineken')"> Heineken </li>
+    <li onclick="fetchPrice('Austral')"> Austral </li>
+</ul>
+
+<h3>COCTELES</h3>
+<ul>
+    <li onclick="fetchPrice('Clavo oxidado')"> Clavo oxidado </li>
+    <li onclick="fetchPrice('Piña Colada')"> Piña Colada </li>
+    <li onclick="fetchPrice('Margarita')"> Margarita </li>
+</ul>
+            </div>
+
+            <div class="divider"></div>
+            <div class="car">
+
+                <i class="fa-solid fa-scroll fa-flip" style="--fa-flip-x: 1; --fa-flip-y: 0; animation-duration: 3s;"> Carro </i>
+            <div id="Car"></div>
+            <ul id="Order"></ul>
+       
+            </div>
+
+            <div class="divider"></div>
+            <div class="price">
+
+                <i  class="fa-solid fa-money-check-dollar fa-flip"  style="--fa-animation-duration: 3s;"> Pago </i>
+                <label><input type="checkbox" id="tipCheckbox" onclick="updateTotal()"> Incluir propina del 10%</label>
+                <p id="total"></p>
+
+
+            </div>
+
+        </div>
+        </div>
+        
+
+        <script>
+            const orderList = [];
+    
+            async function fetchPrice(item) {
+                try {
+                    const response = await fetch(`http://localhost:4000/price/${item}`);
+                    const data = await response.json();
+                    if (response.ok) {
+                        addItemToOrder(data.item, data.price);
+                    } else {
+                        console.error('Item not found');
+                    }
+                } catch (error) {
+                    console.error('Error fetching data');
+                }
+            }
+    
+            function addItemToOrder(item, price) {
+                // Añadir ítem a la lista
+                orderList.push({ item, price });
+                updateOrderList();
+                updateTotal();
+            }
+    
+            function updateOrderList() {
+                const orderElement = document.getElementById('Order');
+                orderElement.innerHTML = '';
+    
+                orderList.forEach((orderItem, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${orderItem.item}: $${orderItem.price.toFixed(2)}`;
+                    listItem.onclick = () => removeItemFromOrder(index); // Hacer clic para remover
+                    orderElement.appendChild(listItem);
+                });
+            }
+    
+            function removeItemFromOrder(index) {
+                // Eliminar ítem por índice
+                orderList.splice(index, 1);
+                updateOrderList();
+                updateTotal();
+            }
+    
+            function updateTotal() {
+                let total = orderList.reduce((sum, orderItem) => sum + orderItem.price, 0);
+                const includeTip = document.getElementById('tipCheckbox').checked;
+                if (includeTip) {
+                    total *= 1.10; // Añadir 10% de propina
+                }
+                document.getElementById('total').textContent = `Total: $${total.toFixed(2)}`;
+            }
+        </script>
+
+
+    </body>
+</html>
